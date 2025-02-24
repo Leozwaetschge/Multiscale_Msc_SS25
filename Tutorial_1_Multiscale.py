@@ -63,12 +63,12 @@ class RandomWalk1D:
         self.random_rand = False
         self.random_normal = True
         self.random_exp = False
-        normal_positions = np.zeros((self.repetition, self.steps + 1))
+        self.normal_positions = np.zeros((self.repetition, self.steps + 1))
         for i in range(self.repetition):
             positions = self.walk(self.steps)
-            normal_positions[i, :] = positions
+            self.normal_positions[i, :] = positions
             axs[2].plot(positions)
-        std_normal = np.std(normal_positions**2, axis=0)
+        std_normal = np.std(self.normal_positions**2, axis=0)
         axs[3].plot(std_normal)
         axs[2].set_title('Random Walk with Normal Distribution')
         axs[3].set_title('Standard Deviation of Squared Positions with Normal Distribution')
@@ -92,17 +92,38 @@ class RandomWalk1D:
             ax.set_ylabel('Position')
 
         plt.tight_layout()
+        
+        # Print normal_positions before showing the plot
+        print(self.normal_positions)
+        
         plt.show()
 
-    def create_grid(self):
-        self.boxsize = 20
-        self.boxstep = self.boxsize // 20
-        self.grid = np.zeros((self.boxsize, self.boxsize))
-        for i in range(self.repetition):
-            pass
+        return self.normal_positions
 
-            
+    def create_grid(self, normal_positions):
+        grid_size = 30
+        grid = np.zeros((grid_size, grid_size))
+
+        # Start position in the middle of the bottom row
+        start_x, start_y = grid_size // 2, 0
+
+        for repetition in normal_positions:
+            for step_index, step in enumerate(repetition):
+                # Calculate relative position
+                rel_x = start_x + int(step//2)
+                rel_y = start_y + step_index  # Move up one row for each step
+                #print(f"Step: {step}, Relative Position: ({rel_x}, {rel_y})")
+
+                # Ensure the position is within the grid bounds
+                if 0 <= rel_x < grid_size and 0 <= rel_y < grid_size:
+                    grid[rel_y, rel_x] += 1
+
+        plt.imshow(grid, interpolation='nearest')
+        plt.colorbar()
+        plt.title('Particle Positions Grid')
+        plt.show()
 
 if __name__ == '__main__':
-    walker = RandomWalk1D(p=0.5, repetition=10000, steps=1000)
-    walker.usefunction()
+    walker = RandomWalk1D(p=0.5, repetition=1000, steps=1000)
+    normal_positions = walker.usefunction()
+    walker.create_grid(normal_positions)
