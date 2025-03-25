@@ -1,0 +1,88 @@
+#
+# General simulation parameters
+#
+dimension       3
+atom_style      atomic
+units           metal
+boundary        p p p
+#
+# Set up an 20*20*20 FCC lattice with lattice constant 4.05 Angstroms 
+#
+lattice fcc 4.05
+region box block 0 20 0 20 0 20
+create_box 1 box
+create_atoms 1 box
+#
+# Define empirical interatomic force
+#
+pair_style eam/alloy
+pair_coeff * * Al99.eam.alloy Al
+#
+# Save defect-free fcc lattice
+#
+write_data fcc_lattice.lammps
+#
+# Define neighbour list parameters
+#
+neighbor        0.3 bin  
+neigh_modify    delay 0 every 10 check no
+#
+# Set to zero temperature
+#
+velocity all create 0.0 220368
+#
+# Define output of thermodynamic variables
+#
+thermo 1
+thermo_style custom step time temp pe ke press vol
+#
+# Calculate the total energy of the perfect FCC lattice 
+#
+fix 1 all nve
+run 0
+#
+# Save this energy as an energy per atom in the variable e0
+#
+variable e0 equal $(pe/atoms)
+#
+# Remove atom to create a single vacancy (to create two vacancies "group vacancy id 15239 15004")
+#
+group vacancy id 15239
+delete_atoms group vacancy
+#
+# Calculate the total energy of the unrelaxed vacancy structure
+#
+run 0
+unfix 1
+variable eVacUR equal $(pe)
+#
+# Relax at fixed volume to a new zero-force configuration
+#
+log log_vacancy.lammps
+write_data initial_state.lammps
+minimize 1.0e-15 1e-15 10000 10000
+write_data final_state.lammps
+#
+# Calculate and save the final total energy of the relaxed FCC structure
+#
+fix 1 all nve
+run 0
+variable eVacR equal $(pe)
+#
+# Calcualte the unrelaxed and relaxed vacancy defect energy
+# Note: the below is different from that given in the script
+# because the variable 'atoms' has been reduced by 1 (or 2 for
+# a di-vacancy).
+#
+variable eVacDefUR equal $(v_eVacUR-v_e0*atoms)
+print 'unrelaxed defect energy : ${eVacDefUR}'
+variable eVacDefR equal $(v_eVacR-v_e0*atoms) 
+print 'relaxed defect energy   : ${eVacDefR}'
+
+
+
+
+
+
+
+

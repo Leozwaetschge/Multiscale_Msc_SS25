@@ -1,0 +1,73 @@
+#
+# General simulation parameters
+#
+dimension    3
+atom_style   atomic
+units        metal
+#
+# Set up an ordered L10 solid solution alloy structure with lattice constant 4.19441044048798 Angstroms 
+#
+lattice custom 4.19441044048798 a1 1.0 0.0 0.0 a2 0.0 1.0 0.0 a3 0.0 0.0 1.0 basis 0.0 0.0 0.0 basis 0.5 0.5 0.0 basis 0.5 0.0 0.5 basis 0.0 0.5 0.5
+region box block 0.0 5.0 0.0 5.0 0.0 5.0
+create_box  2 box
+create_atoms 2 region box basis 1 1 basis 2 1  basis 3 2 basis 4 2
+#
+# Define atomic masses of atom (Cu and Zr)
+#
+mass 1 63.546  
+mass 2 91.224
+#
+# Save starting configuration
+#
+write_data initial_lattice.lammps
+#
+# Define empirical interatomic force
+#
+pair_style    eam/fs
+pair_coeff    * * CuZr_mm.eam.fs Cu Zr
+pair_modify   shift yes
+#
+# Define neighbour list parameters
+#
+neighbor   0.3  bin
+neigh_modify  every  1  delay  0  check  yes
+#
+# Set temperature to 4000K
+#
+velocity all create 4000.0 12345
+#
+# Define output of thermodynamic variables
+#
+thermo 100
+thermo_style custom step time temp pe ke press vol
+#
+# Set time step of 1 femto-second
+#
+timestep 0.001
+#
+# Equilibriation: high temperature NVT liquid simulation at zero pressure & T=4000K
+#
+fix 1 all nvt temp 4000.0 4000.0 0.001
+run 10000
+unfix 1
+#
+# Equilibriation: high temperature NVT liquid simulation at zero pressure & T=2000K
+#
+fix 1 all nvt temp 2000.0 2000.0 0.001
+run 10000
+unfix 1
+#
+# Store every 1000th configuration for visualization in Ovito
+#
+dump 1 all atom 1000 dump_2000-10K_npt.atom
+#
+# NPT rapid quench to room temperature 
+#
+log log_quench.lammps
+fix 1 all npt temp 2000.0 10.0 0.001 iso 0.0 0.0 0.1
+run 100000
+#
+# Output final state of the simulation. Can be used to continue the simulation
+#
+write_restart final_state.restart
+

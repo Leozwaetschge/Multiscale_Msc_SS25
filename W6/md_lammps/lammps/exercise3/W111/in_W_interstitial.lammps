@@ -1,0 +1,115 @@
+#
+# General simulation parameters
+#
+dimension       3
+atom_style      atomic
+units           metal
+boundary        p p p
+atom_modify map array
+#
+# Set up an 20*20*20 BCC lattice with lattice constant 3.1651956 Angstroms 
+#
+lattice bcc 3.1651956
+region box block 0 20 0 20 0 20
+create_box 1 box
+create_atoms 1 box
+#
+# Define atomic mass of atom (W)
+#
+mass 1  183.84
+#
+# Define empirical interatomic force
+#
+pair_style eam/fs
+pair_coeff  * * W_mason17.eam.fs W
+#
+# Save defect-free BCC lattice
+#
+write_data bcc_lattice.lammps
+#
+# Define neighbour list parameters
+#
+neighbor   0.3  bin
+neigh_modify  every  1  delay  0  check  yes
+#
+# Set to zero temperature
+#
+velocity all create 0.0 220368
+#
+# Define output of thermodynamic variables
+#
+thermo 1
+thermo_style custom step time temp pe ke press vol
+#
+# Calculate the total energy of the perfect BCC lattice 
+#
+fix 1 all nve
+run 0
+unfix 1
+variable e0 equal $(pe/atoms)
+#
+# Create interstitial by adding a W atom 
+#
+create_atoms 1 single 1.4332 1.4332 0.0
+#
+# Calculate the total energy of the unrelaxed interstitial structure
+#
+fix 1 all nve
+run 0
+unfix 1
+variable eIntUR equal $(pe)
+#
+# Relax at fixed volume to a new zero-force configuration
+#
+write_data initial_state.lammps
+minimize 1.0e-15 1e-15 10000 10000
+write_data final_state.lammps
+#
+# Calculate and save the final total energy of the relaxed FCC structure
+#
+fix 1 all nve
+run 0
+unfix 1
+variable eIntR equal $(pe)
+#
+# Calculate the unrelaxed and relaxed interstitial defect energy
+# Note: the below is different from that given in the script
+# because the variable 'atoms' has been increased by 1
+#
+variable eIntDefUR equal $(v_eIntUR-v_e0*atoms)
+print 'unrelaxed defect energy : ${eIntDefUR}'
+variable eIntDefR equal $(v_eIntR-v_e0*atoms) 
+print 'relaxed defect energy   : ${eIntDefR}'
+#
+# Set temperature to 1500K
+#
+velocity all create 1500.0 220368
+#
+# Set time step of 1 femto-second
+#
+timestep 0.001
+#
+# Equilibriation: 1500K temperature NPT simulation at zero pressure 
+#
+log log_equil.lammps
+fix 1 all npt temp 1500.0 1500.0 0.001 iso 0.0 0.0 0.1
+thermo 100
+run 5000
+#
+# Remove current npt settings
+#
+unfix 1
+#
+# Store every 100th configuration for visualization in Ovito
+#
+dump 1 all atom 100 dump_1500K_npt.atom
+#
+# Perform 20 picoseconds of MD to study interstitial diffusion
+#
+log log_diffuse.lammps
+fix 1 all npt temp 1500.0 1500.0 0.001 iso 0.0 0.0 0.1
+run 20000
+#
+# Output final configuration. Can be read in by Ovito
+#
+write_restart final_state.restart

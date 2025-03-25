@@ -1,0 +1,71 @@
+#
+# General simulation parameters
+#
+dimension       3
+atom_style      atomic
+units           metal
+boundary        p p p
+#
+# Set up an 5*5*5 FCC lattice with lattice constant 4.05 Angstroms 
+#
+lattice fcc 4.05
+region box block 0 5 0 5 0 5
+create_box 1 box
+create_atoms 1 box
+#
+# Define empirical interatomic force
+#
+pair_style eam/alloy
+pair_coeff * * Al99.eam.alloy Al
+#
+# Define neighbour list parameters
+#
+neighbor        0.3 bin  
+neigh_modify    delay 0 every 10 check no
+#
+# Give atoms random velocities such that the instantaneous temperature is 600K
+#
+velocity all create 300.0 220368
+#
+# Define output of thermodynamic variables
+#
+thermo 100
+thermo_style custom step time temp pe ke press vol
+#
+# Set time step of 1 femto-second
+#
+timestep 0.001
+#
+# Equilibriation: room temperature NPT simulation at zero pressure 
+#
+log log_equil.lammps
+fix 1 all npt temp 300.0 300.0 0.001 iso 0.0 0.0 0.1
+run 100000
+#
+# Remove current npt settings
+#
+unfix 1
+#
+# Store every 1000th configuration for visualization in Ovito
+#
+dump 1 all atom 1000 dump_300-2000K_npt.atom
+#
+# Temperature anneal to 2000K to study thermal expansion and melting
+#
+log log_anneal.lammps
+fix 1 all npt temp 300.0 2000.0 0.001 iso 0.0 0.0 0.1
+run 200000
+#
+# Output final simulation state. Can be used to continue simulation
+#
+write_restart final_state.restart
+
+
+
+
+
+
+
+
+
+
