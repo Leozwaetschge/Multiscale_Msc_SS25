@@ -1,0 +1,31 @@
+<mxfile host="65bd71144e">
+    <diagram id="dVo27TBVcpkh2J-CQDdn" name="Seite-1">
+        <mxGraphModel dx="832" dy="490" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="25" value="&lt;b&gt;Set up surface:&lt;/b&gt;&lt;div&gt;Flat&lt;/div&gt;&lt;div&gt;Sinusodial&lt;/div&gt;&lt;div&gt;Metamaterial&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="140" y="350" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="&lt;b&gt;Divide surface in regions:&lt;/b&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;Frozen&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;Thermostat&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;Newtonian&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="280" y="350" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="&lt;b&gt;Set Boundaries:&lt;/b&gt;&lt;div&gt;Periodic in x and y&lt;/div&gt;&lt;div&gt;off set in z as reflective wall&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="454" y="350" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="&lt;b&gt;Timestep:&lt;/b&gt;&lt;div&gt;&amp;nbsp;1 fs&amp;nbsp;&lt;/div&gt;&lt;div&gt;max motion of 0.2 Å&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="80" y="440" width="110" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="&lt;b&gt;Atom setting:&lt;/b&gt;&lt;div&gt;&amp;nbsp;1 Atom every 2000 timesteps assigned x and z velocities&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="205" y="440" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="&lt;b&gt;Final Act:&lt;/b&gt;&lt;div&gt;all Atoms deposited relaxed for 100 ps&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="510" y="440" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="&lt;b&gt;Adjust System:&lt;/b&gt;&lt;div&gt;update forces and energy field&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="370" y="440" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
