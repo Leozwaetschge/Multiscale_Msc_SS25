@@ -1,1 +1,3 @@
 venv_Multi/
+# Ignoriere alle .lammps-Dateien, die "relax." im Namen enthalten
+*relax.*.lammps
